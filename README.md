@@ -1,2 +1,2 @@
 # Cppsimpleprojetmanager
-# snif c'est vide
+# snif c'est vide voila
