@@ -2,6 +2,7 @@
 
 A simple python script to create and manage simple c++ projects.
 With it you can create a main.cpp file and modules with or without namespaces and with or without class declarations. You can also create new modules and automatically integrate them to your code.
+if there is no `GNUmakefile`, it will automatically create an `GNUmakefile` if there is an
 
 ## Prerequisites
 
