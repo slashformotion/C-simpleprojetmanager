@@ -17,15 +17,18 @@ Then you can compile it if you want (check [this](https://openclassrooms.com/fr/
 
  The syntax is simple :
  ```cppmanager mode main_file_name module1::namespace1::class1 module2::namespace2```
-There is two modes : ```create``` and ```add``` .
+There is two modes :
+- create
+- add
 
-
-### Create
+### CREATE
 
 
 exemple : ```cppmanager create prog mod1::namespace1::class1``` will generate 3 files :
+
 (we can create any number of modules by adding the same syntax over and over ex:
    ```cppmanager create prog mod1::namespace1::class1 mod2::namespace2::class2 mod3::namespace3::class3```)
+
 -------
 prog.cpp
 ```
@@ -73,3 +76,19 @@ namespace namespace1
 
 } // namespace namespace1
 ```
+
+| a | a | a |
+| a | a | a |
+| a | a | a |
+
+
+
+
+
+### ADD
+
+To use this mode, a main file is required (ex prog.cpp)
+
+exemple : ```cppmanager add prog mod50::namespace50```
+
+To demonstrate this
