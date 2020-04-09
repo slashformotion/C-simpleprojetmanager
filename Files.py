@@ -11,7 +11,7 @@ class Module():
 
     def __init__(self, det): # det is modulename::namespacename
         assert isinstance(det, str)
-        
+
         self.namespace = None
         self.class_name = None
         if len(det.split("::"))==1:
@@ -27,7 +27,7 @@ class Module():
     def exists(self, path_init):
         path_hpp = path_init / Path(self.module_name + ".hpp")
         path_cpp = path_init / Path(self.module_name + ".cpp")
-        
+
         if path_hpp.exists():
             print(f"The file {self.module_name}.hpp already exists, aborting...")
             os.abort()
@@ -78,7 +78,7 @@ class Module():
 
 
 
-       
+
 
 
 class Main_File:
@@ -92,28 +92,24 @@ class Main_File:
         assert include.startswith("#include ")
         self.headers_includes.append(include)
 
-    
+
 
     def deploy_at_init(self,PATH):
-        
+
         time = det.datetime.now(tz.tzlocal())
         path = PATH / Path(self._name)
         with path.open("w") as f:
             f.write(f"// File : {self._name}\n")
-            
+
             f.write("// Created : " + time.strftime("%A %d %B") + " at " + time.strftime("%H") + "h - " + time.strftime("%M") + "min\n")
             f.write(f"// user : {getpass.getuser()}")
-            f.write(f"\n\n//// BUILTIN LIBS\n#include <iostream>\n\n//// PERSONAL MODULES\n")
+            f.write(f"\n\n//// PERSONAL MODULES\n")
 
             if len(self.headers_includes)!=0:
                 for include in self.headers_includes:
                     f.write(f"{include}\n")
-            f.write("\n\n#include <iostream>\n\n\n\n\nint main(){\n\n     return 0;\n}\n¨")
-        
-        
-            
-        
-           
+            f.write("\n\n\n//// BUILTIN LIBS\n#include <iostream>\n\n\n\nint main(){\n\n     return 0;\n}\n")      
+
     def deploy_at_runtime(self,PATH):
         path = PATH / Path(self._name)
         raw_data = None
@@ -133,7 +129,7 @@ class Main_File:
             for include in self.headers_includes:
                 new_includes+= include + "\n"
             with path.open("w") as f:
-                
+
                 f.write(new_includes + raw_data)
 
 
@@ -143,5 +139,3 @@ class Main_File:
 
     def get_path(self, PATH):
         return PATH / Path(self._name)
-
-   
