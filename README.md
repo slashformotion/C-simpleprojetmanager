@@ -1,7 +1,12 @@
 # Cppsimpleprojetmanager
 
 A simple python script to create and manage simple c++ projects.
-With it you can create a main.cpp file, modules with or without namespaces and with or without class declaration. You can also create new modules and automatically integrate them to your code.
+With it you can create a main.cpp file and modules with or without namespaces and with or without class declarations. You can also create new modules and automatically integrate them to your code.
+
+## Prerequisites
+
+- Python 3.6 or newer
+
 ## Install
 
 ```git clone https://github.com/slashformotion/cppsimpleprojetmanager.git```   or download the zip archive
@@ -27,7 +32,7 @@ There is two modes :
 exemple : ```cppmanager create prog mod1::namespace1::class1``` will generate 3 files :
 
 (we can create any number of modules by adding the same syntax over and over ex:
-   ```cppmanager create prog mod1::namespace1::class1 mod2::namespace2::class2 mod3::namespace3::class3```)
+     ```cppmanager create prog mod1::namespace1::class1 mod2::namespace2::class2 mod3::namespace3::class3```)
 
 -------
 prog.cpp
@@ -77,18 +82,10 @@ namespace namespace1
 } // namespace namespace1
 ```
 
-| a | a | a |
-| a | a | a |
-| a | a | a |
-
-
-
-
-
 ### ADD
 
+This mode integrate new modules into an existing project.
 To use this mode, a main file is required (ex prog.cpp)
-
 exemple : ```cppmanager add prog mod50::namespace50```
 
-To demonstrate this
+It will add an include directive in the prog.cpp : `#include "mode50.hpp"` and it will create the appropriate files `mod50.hpp` and `mod50.cpp`
