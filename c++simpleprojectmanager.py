@@ -20,8 +20,7 @@ if __name__ == "__main__":
     print(str(PATH.resolve()))
     modules, main = [], None
     
-    *
-    
+    print("mode is", mode_submited)
     ### Checking if the submited mode exists
     if mode_submited not in modes: 
         line =str()
@@ -39,19 +38,34 @@ if __name__ == "__main__":
 
         else:
             main = Files.Main_File(main_name)
-            if not main.exists(PATH):
+            if not main.exists(PATH): ## MODE : CREATE
+                print("ici")
                 for module_det in modules_names:
                     modules.append(Files.Module(module_det))
                 for module in modules:
                     module.exists(PATH)
                     main.add_header_include(module.get_header_include())
                     module.deploy(PATH)
-                main.deploy_init(PATH)
+                main.deploy_at_init(PATH)
                 
 
 
-            else : ## main file provided already exists
-                print(f"The main file you submited already exists at : \"{PATH}\"")
+            else : ## main file provided already exists  --> MODE : ADD
+                if mode_submited == modes[0]: # secu
+                    print(f"The file <{main_name}.cpp> you submited already exists, aborting ...  ")
+                    os.abort()
+                else:
+                    for module_det in modules_names:
+                        modules.append(Files.Module(module_det))
+                    for module in modules:
+                        module.exists(PATH)
+                        main.add_header_include(module.get_header_include())
+                        module.deploy(PATH)
+                    main.deploy_at_runtime(PATH)
+                    
+                    
+
+
 
 
 

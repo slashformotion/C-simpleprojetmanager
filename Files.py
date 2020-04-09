@@ -24,8 +24,8 @@ class Module():
             self.class_name = det.split("::")[2].title()
 
     def exists(self, path_init):
-        path_hpp = path_init / Path(self.module_name + "hpp")
-        path_cpp = path_init / Path(self.module_name + "cpp")
+        path_hpp = path_init / Path(self.module_name + ".hpp")
+        path_cpp = path_init / Path(self.module_name + ".cpp")
         
         if path_hpp.exists():
             print(f"The file {self.module_name}.hpp already exists, aborting...")
@@ -63,6 +63,10 @@ class Module():
         with path.open("w") as f:
             f.write(f"#include \"{self.module_name}.hpp\"\n")
 
+            if self.namespace != None:
+                f.write(f"namespace {self.namespace}\n@\n    \n".replace("@", "{"))
+                f.write(f"@ // namespace {self.namespace}\n\n\n".replace("@", "}"))
+
     def get_header_include(self):
         return f"#include \"{self.module_name}.hpp\""
 
@@ -89,7 +93,7 @@ class Main_File:
 
     
 
-    def deploy_init(self,PATH):
+    def deploy_at_init(self,PATH):
         
         time = det.datetime.now(tz.tzlocal())
         path = PATH / Path(self._name)
@@ -101,10 +105,31 @@ class Main_File:
             if len(self.headers_includes)!=0:
                 for include in self.headers_includes:
                     f.write(f"{include}\n")
-            f.write("\n\n#include <iostream>\n\n\n\n\nint main(void){\n\n     return 0;\n}\n¨")
+            f.write("\n\n#include <iostream>\n\n\n\n\nint main(){\n\n     return 0;\n}\n¨")
             
         
            
+    def deploy_at_runtime(self,PATH):
+        path = PATH / Path(self._name)
+        raw_data = None
+        with path.open("r") as f:
+            raw_data = f.read()
+        sep = "//// PERSONAL MODULES\n"
+        if sep in raw_data:
+            raw_data_splited = raw_data.split(sep)
+            start, end = raw_data_splited[0], raw_data_splited[1]
+            new_includes = str()
+            for include in self.headers_includes:
+                new_includes+= include + "\n"
+            new_raw_data = start + sep+new_includes+end
+            with path.open("w") as f:
+                f.write(new_raw_data)
+        else:
+            for include in self.headers_includes:
+                new_includes+= include + "\n"
+            with path.open("w") as f:
+                
+                f.write(new_includes + raw_data)
 
 
 
@@ -112,6 +137,6 @@ class Main_File:
         return self.get_path(PATH).exists()
 
     def get_path(self, PATH):
-        return PATH / Path(self._name + ".cpp")
+        return PATH / Path(self._name)
 
    
