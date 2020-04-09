@@ -1,39 +1,26 @@
 import os
 import sys 
+import pathlib as pl 
+from pathlib import Path
 
-def unpack_args(args):
-    return args[1],args[2],args[3:]
-
-def add_prefix(elems, prefix):
-    try:
-        assert(type(elems) is list)
-        assert(type(prefix) is str)
-    except AssertionError:
-        print("Type Error in arguments")
-
-    return [elem + prefix for elem in elems]
-        
+import lib
+import Files
 
 
-    
-def get_files_names_from_unpack_args(main, headers):
-    cpps = add_prefix(headers, ".cpp")
-    headers = add_prefix(headers, '.hpp')
-    main = main + ".cpp"
-    return main, cpps, headers
-    
+
+
+
 
 if __name__ == "__main__": 
-    ######################################################################
-    ######################## A MODIFIER SI BESOIN ########################
-    makefile_path = "/home/slash/Software/makefiles/GNUmakefile"
-    ######################################################################
-    ######################################################################
+    
     #executing
     modes = ['create', 'add']
-    mode_submited, main, headers = unpack_args(sys.argv)
-    PATH = os.getcwd()
+    mode_submited, main_name, modules_names = lib.unpack_args(sys.argv)
+    PATH = Path(os.getcwd())
+    print(str(PATH.resolve()))
+    modules, main = [], None
     
+    *
     
     ### Checking if the submited mode exists
     if mode_submited not in modes: 
@@ -43,308 +30,39 @@ if __name__ == "__main__":
                 line += "\"" + mode + "\", "
             else:
                 line +=  "\"" + mode + "\""
-        print(f"this mode \"{mode_submited}\" do not exit, please retry with a correct one ({line})")
-        os.abort()
-
-    if mode_submited == modes[0]:
-        ##creating the project
-        main_file, cpps_files, headers_files = get_files_names_from_unpack_args(main, headers)
-        #checking if a file which is due to be created is already existing
-        files_names_to_check = [main_file]+headers_files+cpps_files
-        for file in files_names_to_check:
-            if os.path.exists(os.path.join(PATH, file)):
-                print(f"ERROR the file <{file}> already exists")
-                os.abort()
+        print(f"This mode \"{mode_submited}\" do not exist, please retry with a correct one ({line})")
         
-        #creating and filling main file
-        with open(main_file, 'w') as flux:
-            for header_file_name in headers_files:
-                flux.write(f"#include \"{header_file_name}\"\n")
-            flux.write(f"\n\n#include <iostream>\n\n\n\n\nint main(void)@\n\n     return 0;\n¨".replace('@','{').replace('¨','}')) #formatage de merde mais bon tant pis ça marche
+    else:
+        if len(modules_names)==0 and mode_submited==mode[1]:
+            print("This mode (add) is not usable with 0 modules names provided")
+
+
+        else:
+            main = Files.Main_File(main_name)
+            if not main.exists(PATH):
+                for module_det in modules_names:
+                    modules.append(Files.Module(module_det))
+                for module in modules:
+                    module.exists(PATH)
+                    main.add_header_include(module.get_header_include())
+                    module.deploy(PATH)
+                main.deploy_init(PATH)
+                
+
+
+            else : ## main file provided already exists
+                print(f"The main file you submited already exists at : \"{PATH}\"")
+
+
+
+                
+         
+
+            
         
-        #creating and filling modules.cpp files (list -> cpps_files)
-        for cpp_file in cpps_files:
-            with open(cpp_file, 'w') as flux:
-                for header_file_name in headers_files:
-                    flux.write(f"#include \"{header_file_name}\"\n")
+
+        ######## MAKEFILE TIME
         
-        #creating and filling headers 
-        for header_file in headers_files:
-            with open(header_file, 'w') as flux:
-                flux.write(f"#ifndef {header_file.upper().replace('.', '_')}\n#define {header_file.upper().replace('.', '_')}\n\n\n#endif")
+        #checking is the make file if there 
         
-        #print infos
-        print(f"~~~~~INFOS~~~~~")
-        print("Fichier(s) créé(s):")
-        for filename in [main_file]+headers_files+cpps_files:
-            print(f"   -{filename}")
-        print("\n")
-        
-        
-    elif mode_submited == modes[1]:
-        ##add mondules and headers mode
-        main_file, cpps_files, headers_files = get_files_names_from_unpack_args(main, headers)
-
-        #creating and filling headers
-        for header_file in headers_files:
-            with open(header_file, 'w') as flux:
-                flux.write(f"#ifndef {header_file.upper().replace('.', '_')}\n#define {header_file.upper().replace('.', '_')}\n\n\n#endif")
-
-        #creating and filling modules.cpp files (list -> cpps_files)
-        for cpp_file in cpps_files:
-            with open(cpp_file, 'w') as flux:
-                for header_file_name in headers_files:
-                    flux.write(f"#include \"{header_file_name}\"\n\n\n")
-
-        #filling main file
-        file_content, include_headers = "",""
-        for header_name in headers_files:
-            include_headers += f"#include \"{header_name}\"\n"
-        with open(main_file,'r') as f:
-            file_content = f.read()
-        with open(main_file,'w') as f:
-            f.write(include_headers + file_content)
-
-        #print infos
-        print(f"~~~~~INFOS~~~~~")
-        print(f"Fichier modifié :\n   -{main_file}")
-        print("Fichier(s) créé(s) et modifié(s):")
-        for filename in headers_files+cpps_files:
-            print(f"   -{filename}")
-        print("\n")
-    
-
-    ######## MAKEFILE TIME
-    
-    #checking is the make file if there 
-    if not os.path.exists(os.path.join(PATH, "GNUmakefile")):
-        print(f"GNUmakefile didn't exists at \"{os.path.join(PATH, 'GNUmakefile')}\", so it was created for you ;)")
-        with open(os.path.join(PATH, "GNUmakefile"), 'w') as flux:
-            flux.write("""#-----------------------------------------------------------------------------
-# this GNU-makefile relies on the GCC toolchain
-# nb: on Windows, the Mingw-w64 package provides the mingw32-make.exe command
-#     ( see http://www.enib.fr/~harrouet/s4prc/#environ.windows )
-
-#~~~~ control global settings ~~~~
-# make opt=2 --> enable optimisation, then disable debug, but keep symbols
-# make opt=1 --> enable optimisation, then disable debug
-# make opt=0 --> disable optimisation, then enable debug
-opt=0
-# make clang=1 --> use clang/clang++, not gcc/g++
-# make clang=0 --> use gcc/g++, not clang/clang++
-clang=0
-# make wasm=1 --> target webassembly rather than the native platform
-# make wasm=0 --> target the native platform rather than webassembly
-wasm=0
-
-#~~~~ build library or programs ~~~~
-# if LIB_TARGET is provided, this library will be built (with its
-# platform-specific name), otherwise ${EXE_PREFIX}* programs will be built
-LIB_TARGET=
-EXE_PREFIX=prog
-
-#~~~~ detect operating system ~~~~
-ifneq (${OS},Windows_NT)
-  ifneq (,${findstring Microsoft,${shell cat /proc/version 2>/dev/null}})
-    # Windows-Subsystem-for-Linux
-    OS:=WSL
-  else ifneq (,${findstring Ubuntu,${shell lsb_release -i 2>/dev/null}})
-    OS:=Ubuntu
-  else ifneq (,${findstring Raspbian,${shell lsb_release -i 2>/dev/null}})
-    # Standard distribution for Raspberry-Pi
-    OS:=Raspbian
-  else
-    OS:=${strip ${shell uname -s}}
-  endif
-endif
-
-#~~~~ adjust project-specific settings ~~~~
-CPPFLAGS=
-# CPPFLAGS+=-I header/path
-LDFLAGS=
-# LDFLAGS+=-L library/path -Wl,-rpath,library/path -l library_name
-CFLAGS=
-CXXFLAGS=
-BINFLAGS=
-ifeq (${OS},Windows_NT)
-  # nothing special for now
-else
-  ifneq (,${strip ${LIB_TARGET}})
-    BINFLAGS+=-fPIC
-  endif
-  ifeq (${OS},Darwin)
-    # nothing special for now
-  else
-    ifeq (${OS},Ubuntu)
-      # sanitizer requires gold-linker on Ubuntu
-      LDFLAGS+=-fuse-ld=gold
-    else ifeq (${OS},Raspbian)
-      # some warnings may appear when mixing g++-6 and g++-7 on Raspbian
-      CXXFLAGS+=-Wno-psabi
-    else
-      # nothing special for now
-    endif
-  endif
-endif
-
-#~~~~ adjust platform-specific features (Posix/Windows/Emscripten...) ~~~~
-ifeq (${OS},Windows_NT)
-  LIB_PREFIX=
-  LIB_SUFFIX=.dll
-  EXE_SUFFIX=.exe
-  SKIP_LINE=echo.
-  REMOVE=del /q
-else
-  LIB_PREFIX=lib
-  ifeq (${OS},Darwin)
-    LIB_SUFFIX=.dylib
-  else
-    LIB_SUFFIX=.so
-  endif
-  EXE_SUFFIX=
-  SKIP_LINE=echo
-  REMOVE=rm -rf
-endif
-ifeq (${strip ${wasm}},1)
-  LIB_PREFIX:=lib
-  LIB_SUFFIX:=.bc
-  EXE_SUFFIX:=.html
-endif
-
-#~~~~ deduce file names ~~~~
-ifneq (,${strip ${LIB_TARGET}})
-  LIB_TARGET:=${LIB_PREFIX}${strip ${LIB_TARGET}}${LIB_SUFFIX}
-  MAIN_C_FILES=
-  MAIN_CXX_FILES=
-else
-  LIB_TARGET:=
-  MAIN_C_FILES=${wildcard ${strip ${EXE_PREFIX}}*.c}
-  MAIN_CXX_FILES=${wildcard ${strip ${EXE_PREFIX}}*.cpp}
-endif
-COMMON_C_FILES=${filter-out ${MAIN_C_FILES},${wildcard *.c}}
-COMMON_CXX_FILES=${filter-out ${MAIN_CXX_FILES},${wildcard *.cpp}}
-#
-MAIN_OBJECT_FILES=${sort ${patsubst %.c,%.o,${MAIN_C_FILES}} \
-                         ${patsubst %.cpp,%.o,${MAIN_CXX_FILES}}}
-COMMON_OBJECT_FILES=${sort ${patsubst %.c,%.o,${COMMON_C_FILES}} \
-                           ${patsubst %.cpp,%.o,${COMMON_CXX_FILES}}}
-OBJECT_FILES=${MAIN_OBJECT_FILES} ${COMMON_OBJECT_FILES}
-DEPEND_FILES=${patsubst %.o,%.d,${OBJECT_FILES}}
-EXE_FILES=${sort ${patsubst %.c,%${EXE_SUFFIX},${MAIN_C_FILES}} \
-                 ${patsubst %.cpp,%${EXE_SUFFIX},${MAIN_CXX_FILES}}}
-#
-GENERATED_FILES=${DEPEND_FILES} ${OBJECT_FILES} ${LIB_TARGET} ${EXE_FILES}
-ifeq (${OS},Darwin)
-  GENERATED_FILES+=${wildcard *.dSYM}
-endif
-ifeq (${strip ${wasm}},1)
-  GENERATED_FILES+=${patsubst %.html,%.js,${EXE_FILES}}
-  GENERATED_FILES+=${patsubst %.html,%.html.mem,${EXE_FILES}}
-  GENERATED_FILES+=${patsubst %.html,%.wasm,${EXE_FILES}}
-  GENERATED_FILES+=${patsubst %.html,%.wast,${EXE_FILES}}
-endif
-GENERATED_FILES+=${wildcard output_* *~}
-
-#~~~~ compiler/linker settings ~~~~
-CPPFLAGS+=-MMD -pedantic -Wall -Wextra -Wconversion
-CPPFLAGS+=-Wno-unused -Wno-unused-parameter -Werror -Wfatal-errors
-CFLAGS+=-std=c99 -Wc++-compat -Wwrite-strings -Wold-style-definition -Wvla
-CXXFLAGS+=-std=c++17
-CXXFLAGS+=-Wno-missing-braces -Wno-sign-conversion
-LDFLAGS+=
-BINFLAGS+=
-ifeq (${strip ${wasm}},1)
-  CC=emcc
-  CXX=em++
-  CPPFLAGS+=-Wno-dollar-in-identifier-extension
-  LDFLAGS+=-s ALLOW_MEMORY_GROWTH=1
-else ifeq (${strip ${clang}},1)
-  CC=clang
-  CXX=clang++
-else
-  CC=gcc
-  CXX=g++
-endif
-#
-ifneq (,${strip ${MAIN_CXX_FILES} ${COMMON_CXX_FILES}})
-  # force c++ link if there is at least one c++ source file
-  LD:=${CXX}
-else
-  LD:=${CC}
-endif
-
-#~~~~ debug/optimisation settings ~~~~
-ifneq (${strip ${opt}},0)
-  CPPFLAGS+=-DNDEBUG
-  BINFLAGS+=-O3 -ffast-math
-  # BINFLAGS+=-fopt-info-vec-optimized
-  ifneq (${strip ${wasm}},1)
-    BINFLAGS+=-march=native
-  endif
-  ifeq (${strip ${opt}},2)
-    # optimise but keep symbols for profiling
-    BINFLAGS+=-g -fno-omit-frame-pointer
-  else
-    BINFLAGS+=-fomit-frame-pointer
-  endif
-else
-  CPPFLAGS+=-UNDEBUG
-  BINFLAGS+=-g -O0
-  ifeq (${strip ${wasm}},1)
-    # sanitizer is not available yet with Emscripten
-  else ifeq (${OS},Windows_NT)
-    # sanitizer is not available yet on Windows
-  else ifeq (${OS},WSL)
-    # sanitizer is not available yet on Windows-Subsystem-for-Linux
-  else
-    BINFLAGS+=-fsanitize=address,undefined
-    ifeq (${OS},Raspbian)
-      # dynamic sanitizer libraries may not be found on Raspbian
-      BINFLAGS+=-static-libasan -static-libubsan
-    endif
-  endif
-endif
-
-#~~~~ main target ~~~~
-all : ${EXE_FILES} ${LIB_TARGET}
-
-rebuild : clean all
-
-.SUFFIXES:
-.SECONDARY:
-.PHONY: all clean rebuild
-
-#~~~~ linker command to produce the library (if any) ~~~~
-${LIB_TARGET} : ${COMMON_OBJECT_FILES}
-	@echo ==== linking [opt=${opt}] $@ ====
-	${LD} -shared -o $@ $^ ${BINFLAGS} ${LDFLAGS}
-	@${SKIP_LINE}
-
-#~~~~ linker command to produce the executable files (if any) ~~~~
-%${EXE_SUFFIX} : %.o ${COMMON_OBJECT_FILES}
-	@echo ==== linking [opt=${opt}] $@ ====
-	${LD} -o $@ $^ ${BINFLAGS} ${LDFLAGS}
-	@${SKIP_LINE}
-
-#~~~~ compiler command for every source file ~~~~
-%.o : %.c
-	@echo ==== compiling [opt=${opt}] $< ====
-	${CC} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CFLAGS}
-	@${SKIP_LINE}
-
-%.o : %.cpp
-	@echo ==== compiling [opt=${opt}] $< ====
-	${CXX} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CXXFLAGS}
-	@${SKIP_LINE}
-
--include ${DEPEND_FILES}
-
-#~~~~ remove generated files ~~~~
-clean :
-	@echo ==== cleaning ====
-	${REMOVE} ${GENERATED_FILES}
-	@${SKIP_LINE}
-
-#-----------------------------------------------------------------------------
-""")
 
