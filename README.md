@@ -18,7 +18,7 @@ Then you can compile it if you want (check [this](https://openclassrooms.com/fr/
  Personally I use this alias to make is usable in all my system :
  ```alias cppmanager='python3 <path/to/cppsimpleprojetmanager.py>'```
 
- ## Juste use it ! (but this not so straightforward)
+ ## Juste use it ! (not so straightforward)
 
  The syntax is simple :
  ```cppmanager mode main_file_name module1::namespace1::class1 module2::namespace2```
