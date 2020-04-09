@@ -214,34 +214,33 @@ rebuild : clean all
 
 #~~~~ linker command to produce the library (if any) ~~~~
 ${LIB_TARGET} : ${COMMON_OBJECT_FILES}
-    @echo ==== linking [opt=${opt}] $@ ====
-    ${LD} -shared -o $@ $^ ${BINFLAGS} ${LDFLAGS}
-    @${SKIP_LINE}
+	@echo ==== linking [opt=${opt}] $@ ====
+	${LD} -shared -o $@ $^ ${BINFLAGS} ${LDFLAGS}
+	@${SKIP_LINE}
 
 #~~~~ linker command to produce the executable files (if any) ~~~~
 %${EXE_SUFFIX} : %.o ${COMMON_OBJECT_FILES}
-    @echo ==== linking [opt=${opt}] $@ ====
-    ${LD} -o $@ $^ ${BINFLAGS} ${LDFLAGS}
-    @${SKIP_LINE}
+	@echo ==== linking [opt=${opt}] $@ ====
+	${LD} -o $@ $^ ${BINFLAGS} ${LDFLAGS}
+	@${SKIP_LINE}
 
 #~~~~ compiler command for every source file ~~~~
 %.o : %.c
-    @echo ==== compiling [opt=${opt}] $< ====
-    ${CC} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CFLAGS}
-    @${SKIP_LINE}
+	@echo ==== compiling [opt=${opt}] $< ====
+	${CC} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CFLAGS}
+	@${SKIP_LINE}
 
 %.o : %.cpp
-    @echo ==== compiling [opt=${opt}] $< ====
-    ${CXX} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CXXFLAGS}
-    @${SKIP_LINE}
+	@echo ==== compiling [opt=${opt}] $< ====
+	${CXX} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CXXFLAGS}
+	@${SKIP_LINE}
 
 -include ${DEPEND_FILES}
 
 #~~~~ remove generated files ~~~~
 clean :
-    @echo ==== cleaning ====
-    ${REMOVE} ${GENERATED_FILES}
-    @${SKIP_LINE}
+	@echo ==== cleaning ====
+	${REMOVE} ${GENERATED_FILES}
+	@${SKIP_LINE}
 
-#-----------------------------------------------------------------------------
-"""
+#-----------------------------------------------------------------------------"""
