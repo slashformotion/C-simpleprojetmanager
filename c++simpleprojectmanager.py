@@ -17,10 +17,8 @@ if __name__ == "__main__":
     modes = ['create', 'add']
     mode_submited, main_name, modules_names = lib.unpack_args(sys.argv)
     PATH = Path(os.getcwd())
-    print(str(PATH.resolve()))
     modules, main = [], None
     
-    print("mode is", mode_submited)
     ### Checking if the submited mode exists
     if mode_submited not in modes: 
         line =str()
@@ -39,7 +37,6 @@ if __name__ == "__main__":
         else:
             main = Files.Main_File(main_name)
             if not main.exists(PATH): ## MODE : CREATE
-                print("ici")
                 for module_det in modules_names:
                     modules.append(Files.Module(module_det))
                 for module in modules:
@@ -47,36 +44,42 @@ if __name__ == "__main__":
                     main.add_header_include(module.get_header_include())
                     module.deploy(PATH)
                 main.deploy_at_init(PATH)
-                
+                if len(modules)!=0:
+                        
+                        print("~~~ Files Created : ~~~")
+                        for module in modules:
+                            print(f"    - {module.module_name}.cpp")
+                            print(f"    - {module.module_name}.hpp")
+                        print(f"    - {main_name}.cpp")
+                        
+                else: 
+                       print("Nothing happened, my friend! (You submited 0 name for module creation.)")
 
-
-            else : ## main file provided already exists  --> MODE : ADD
+            else : ## main file provided already exists 
                 if mode_submited == modes[0]: # secu
                     print(f"The file <{main_name}.cpp> you submited already exists, aborting ...  ")
                     os.abort()
-                else:
+                else: ## MODE ADD
                     for module_det in modules_names:
                         modules.append(Files.Module(module_det))
                     for module in modules:
                         module.exists(PATH)
                         main.add_header_include(module.get_header_include())
                         module.deploy(PATH)
-                    main.deploy_at_runtime(PATH)
-                    
-                    
+                    if len(modules)!=0:
+                        main.deploy_at_runtime(PATH)
+                        print("~~~ Files Created : ~~~")
+                        for module in modules:
+                            print(f"    - {module.module_name}.cpp")
+                            print(f"    - {module.module_name}.hpp")
 
-
-
-
-
-                
-         
-
-            
-        
-
+                        print(f"{main_name}.cpp have been modified")
+                    else: 
+                        print("Nothing happened, my friend! (You submited 0 name for module creation.)")
+                        
         ######## MAKEFILE TIME
         
         #checking is the make file if there 
+        lib.check_makefile(PATH)
         
 

@@ -10,6 +10,12 @@ def unpack_args(args):
         return args[1], args[2], []
     elif len(args) >= 3:
         return args[1], args[2], args[3:]
+
+def check_makefile(PATH):
+    if not os.path.exists(os.path.join(PATH, "GNUmakefile")):
+        print(f"GNUmakefile didn't exists at \"{os.path.join(PATH, 'GNUmakefile')}\", so it was created for you ;)")
+        with open(os.path.join(PATH, "GNUmakefile"), 'w') as flux:
+            flux.write(GNUmakefile_content)
     
 
 GNUmakefile_content = """#-----------------------------------------------------------------------------
@@ -208,34 +214,34 @@ rebuild : clean all
 
 #~~~~ linker command to produce the library (if any) ~~~~
 ${LIB_TARGET} : ${COMMON_OBJECT_FILES}
-	@echo ==== linking [opt=${opt}] $@ ====
-	${LD} -shared -o $@ $^ ${BINFLAGS} ${LDFLAGS}
-	@${SKIP_LINE}
+    @echo ==== linking [opt=${opt}] $@ ====
+    ${LD} -shared -o $@ $^ ${BINFLAGS} ${LDFLAGS}
+    @${SKIP_LINE}
 
 #~~~~ linker command to produce the executable files (if any) ~~~~
 %${EXE_SUFFIX} : %.o ${COMMON_OBJECT_FILES}
-	@echo ==== linking [opt=${opt}] $@ ====
-	${LD} -o $@ $^ ${BINFLAGS} ${LDFLAGS}
-	@${SKIP_LINE}
+    @echo ==== linking [opt=${opt}] $@ ====
+    ${LD} -o $@ $^ ${BINFLAGS} ${LDFLAGS}
+    @${SKIP_LINE}
 
 #~~~~ compiler command for every source file ~~~~
 %.o : %.c
-	@echo ==== compiling [opt=${opt}] $< ====
-	${CC} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CFLAGS}
-	@${SKIP_LINE}
+    @echo ==== compiling [opt=${opt}] $< ====
+    ${CC} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CFLAGS}
+    @${SKIP_LINE}
 
 %.o : %.cpp
-	@echo ==== compiling [opt=${opt}] $< ====
-	${CXX} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CXXFLAGS}
-	@${SKIP_LINE}
+    @echo ==== compiling [opt=${opt}] $< ====
+    ${CXX} -o $@ $< -c ${BINFLAGS} ${CPPFLAGS} ${CXXFLAGS}
+    @${SKIP_LINE}
 
 -include ${DEPEND_FILES}
 
 #~~~~ remove generated files ~~~~
 clean :
-	@echo ==== cleaning ====
-	${REMOVE} ${GENERATED_FILES}
-	@${SKIP_LINE}
+    @echo ==== cleaning ====
+    ${REMOVE} ${GENERATED_FILES}
+    @${SKIP_LINE}
 
 #-----------------------------------------------------------------------------
 """

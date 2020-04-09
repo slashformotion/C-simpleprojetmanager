@@ -3,6 +3,7 @@ from pathlib import Path
 import datetime as det
 import dateutil.tz as tz
 import os
+import getpass
 
 
 
@@ -99,13 +100,17 @@ class Main_File:
         path = PATH / Path(self._name)
         with path.open("w") as f:
             f.write(f"// File : {self._name}\n")
-            #f.write(f"// Created -> {time.strftime("%A %d %B")} at {time.strftime("%A")}h{time.strftime("%A")}\n")
+            
+            f.write("// Created : " + time.strftime("%A %d %B") + " at " + time.strftime("%H") + "h - " + time.strftime("%M") + "min\n")
+            f.write(f"// user : {getpass.getuser()}")
             f.write(f"\n\n//// BUILTIN LIBS\n#include <iostream>\n\n//// PERSONAL MODULES\n")
 
             if len(self.headers_includes)!=0:
                 for include in self.headers_includes:
                     f.write(f"{include}\n")
             f.write("\n\n#include <iostream>\n\n\n\n\nint main(){\n\n     return 0;\n}\n¨")
+        
+        
             
         
            
