@@ -27,7 +27,6 @@ class Module():
     def exists(self, path_init):
         path_hpp = path_init / Path(self.module_name + ".hpp")
         path_cpp = path_init / Path(self.module_name + ".cpp")
-
         if path_hpp.exists():
             print(f"The file {self.module_name}.hpp already exists, aborting...")
             os.abort()
