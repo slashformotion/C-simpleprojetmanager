@@ -51,38 +51,10 @@ def find_files(path, ext):
     assert isinstance(ext, str)
     file_list = []
     for cpp in sorted(path.glob(f"*.{ext}")):
-        file_list.append(pl.Path(cpp))
+        file_list.append(pl.Path(cpp)) 
     return file_list
 
     
-def is_one_char_not_a_whitespace(text):
-    assert type(text) is str
-
-    for c in text:
-        if c!= " ": # if one on the caracter of txt is not a whitespace
-            return True
-    
-    return False
-
-def is_there_space_in_middle_str(text):
-    assert type(text) is str
-
-    while text.startswith(" ") or text.endswith(" "):
-        if text.startswith(" "):
-            text = text[1:]
-
-        if text.endswith(" "):
-            text = text[:-1]
-
-    
-    for c in text:
-        if c == " ":
-            return True
-    return False
-
-        
-
-
 
 
 if __name__ == "__main__":

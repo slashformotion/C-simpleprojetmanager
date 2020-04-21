@@ -1,7 +1,7 @@
 from PySide2 import QtWidgets
 from ui import main_win
-import pathlib as pl 
-import lib
+import pathlib as pl
+from utils import finder, str_handling
 
 
 
@@ -60,18 +60,18 @@ class App(QtWidgets.QMainWindow):
 
     def update_modules(self):
         self.ui.liwd_modules_existant.clear()
-        for header in lib.find_headers(self.PATH):
+        for header in finder.find_headers(self.PATH):
             self.ui.liwd_modules_existant.addItem(header.name)
 
     def update_modes_main(self):
         if self.mode == "create":
             self.ui.lied_main_file.setReadOnly(False)
 
-            if len(lib.find_main_file(self.PATH)) != 0: 
+            if len(finder.find_main_file(self.PATH)) != 0: 
                 # TODO : implement popup here ERROR
                 print(f"There is already at least one main file in the workspace you provided .")
                 self.ui.lied_main_file.setReadOnly(True)
-                self.set_main_file(lib.find_main_file(self.PATH)[0])
+                self.set_main_file(finder.find_main_file(self.PATH)[0])
                 self.ui.lied_main_file.setStyleSheet("background-color: #ff5252;")
             else:
                 self.ui.lied_main_file.clear()
@@ -79,18 +79,18 @@ class App(QtWidgets.QMainWindow):
         elif self.mode == "add":
             self.ui.lied_main_file.setReadOnly(True)
 
-            if len(lib.find_main_file(self.PATH)) == 0: 
+            if len(finder.find_main_file(self.PATH)) == 0: 
                 # TODO : implement popup here ERROR
                 print(f"There is already no main file in the workspace you provided .")
                 self.ui.lied_main_file.clear()
                 print("debug")
                 self.ui.lied_main_file.setStyleSheet("background-color: #ff5252;")
-            elif len(lib.find_main_file(self.PATH)) > 1:
+            elif len(finder.find_main_file(self.PATH)) > 1:
                 # TODO : implement popup here ERROR
                 print(f"There is already to many main file in the workspace you provided .")
                 self.ui.lied_main_file.setStyleSheet("background-color: #ff5252;")
             else : # good ending
-                self.set_main_file(lib.find_main_file(self.PATH)[0])
+                self.set_main_file(finder.find_main_file(self.PATH)[0])
                 self.ui.lied_main_file.setStyleSheet("background-color: #69ff78;")
 
     def update_generator(self):
@@ -125,7 +125,7 @@ class App(QtWidgets.QMainWindow):
         
     
         for lied in line_edit_generator:            
-            if lib.is_there_space_in_middle_str(lied.text()):
+            if str_handling.is_there_space_in_middle_str(lied.text()):
                 lied.setStyleSheet("background-color: #ffd280;")
                 
 
@@ -136,10 +136,10 @@ class App(QtWidgets.QMainWindow):
 
         for module_name, namespace, class_name in zip(module_names_list,namespaces_list, class_s_list):
 
-            if lib.is_one_char_not_a_whitespace(namespace.text()) and not lib.is_one_char_not_a_whitespace(module_name.text()):
+            if str_handling.is_one_char_not_a_whitespace(namespace.text()) and not str_handling.is_one_char_not_a_whitespace(module_name.text()):
                 module_name.setStyleSheet("background-color: #ff5252;")
 
-            if lib.is_one_char_not_a_whitespace(class_name.text()) and not lib.is_one_char_not_a_whitespace(namespace.text()):
+            if str_handling.is_one_char_not_a_whitespace(class_name.text()) and not str_handling.is_one_char_not_a_whitespace(namespace.text()):
                 namespace.setStyleSheet("background-color: #ff5252;")
                 
 

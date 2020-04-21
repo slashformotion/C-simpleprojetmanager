@@ -6,3 +6,4 @@ venv/*
 xmind/*
 ui/__pycache__/*
 src/ui/__pycache__/*
+src/utils/__pycache__/*
