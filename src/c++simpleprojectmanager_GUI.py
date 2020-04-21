@@ -33,7 +33,7 @@ class App(QtWidgets.QMainWindow):
         self.ui.cbb_mode.currentIndexChanged.connect(lambda: self.update_init())
 
         # generator line edit
-        module_names_list = [
+        line_edit_generator = [
             self.ui.lied_mod0,
             self.ui.lied_mod1,
             self.ui.lied_mod2,
@@ -44,8 +44,8 @@ class App(QtWidgets.QMainWindow):
             self.ui.lied_class1,
             self.ui.lied_class2
         ]
-        update_funct = lambda: self.update_generator()
-        for lied in module_names_list:
+        update_funct = lambda: self.update_generator() # fonction update pour tout les champs de génération
+        for lied in line_edit_generator:
             lied.editingFinished.connect(update_funct)
             lied.textEdited.connect(update_funct)
         
@@ -72,7 +72,7 @@ class App(QtWidgets.QMainWindow):
                 print(f"There is already at least one main file in the workspace you provided .")
                 self.ui.lied_main_file.setReadOnly(True)
                 self.set_main_file(lib.find_main_file(self.PATH)[0])
-                self.ui.lied_main_file.setStyleSheet("background-color: red;")
+                self.ui.lied_main_file.setStyleSheet("background-color: #ff5252;")
             else:
                 self.ui.lied_main_file.clear()
                 self.ui.lied_main_file.setStyleSheet("background-color: white;")
@@ -84,14 +84,14 @@ class App(QtWidgets.QMainWindow):
                 print(f"There is already no main file in the workspace you provided .")
                 self.ui.lied_main_file.clear()
                 print("debug")
-                self.ui.lied_main_file.setStyleSheet("background-color: red;")
+                self.ui.lied_main_file.setStyleSheet("background-color: #ff5252;")
             elif len(lib.find_main_file(self.PATH)) > 1:
                 # TODO : implement popup here ERROR
                 print(f"There is already to many main file in the workspace you provided .")
-                self.ui.lied_main_file.setStyleSheet("background-color: red;")
+                self.ui.lied_main_file.setStyleSheet("background-color: #ff5252;")
             else : # good ending
                 self.set_main_file(lib.find_main_file(self.PATH)[0])
-                self.ui.lied_main_file.setStyleSheet("background-color: green;")
+                self.ui.lied_main_file.setStyleSheet("background-color: #69ff78;")
 
     def update_generator(self):
         module_names_list = [
@@ -109,17 +109,45 @@ class App(QtWidgets.QMainWindow):
             self.ui.lied_class1,
             self.ui.lied_class2
         ]
-        for module_name, namespace in zip(module_names_list,namespaces_list):
-            if namespace.text() != "" and module_name.text() == "":
-                module_name.setStyleSheet("background-color: red;")
-            else:
-                module_name.setStyleSheet("background-color: white;")
 
-        for namespace, class_name in zip(namespaces_list, class_s_list):
-            if class_name.text() != "" and namespace.text() == "":
-                namespace.setStyleSheet("background-color: red;")
+        line_edit_generator = [
+            self.ui.lied_mod0,
+            self.ui.lied_mod1,
+            self.ui.lied_mod2,
+            self.ui.lied_namespace0,
+            self.ui.lied_namespace1,
+            self.ui.lied_namespace2,
+            self.ui.lied_class0,
+            self.ui.lied_class1,
+            self.ui.lied_class2
+        ]
+
+        
+    
+        for lied in line_edit_generator:            
+            if lib.is_there_space_in_middle_str(lied.text()):
+                lied.setStyleSheet("background-color: #ffd280;")
+                
+
             else:
-                namespace.setStyleSheet("background-color: white;")
+                lied.setStyleSheet("background-color: white;")
+
+
+
+        for module_name, namespace, class_name in zip(module_names_list,namespaces_list, class_s_list):
+
+            if lib.is_one_char_not_a_whitespace(namespace.text()) and not lib.is_one_char_not_a_whitespace(module_name.text()):
+                module_name.setStyleSheet("background-color: #ff5252;")
+
+            if lib.is_one_char_not_a_whitespace(class_name.text()) and not lib.is_one_char_not_a_whitespace(namespace.text()):
+                namespace.setStyleSheet("background-color: #ff5252;")
+                
+
+            
+
+        print("update generator")
+
+        
 
 
     
@@ -128,6 +156,8 @@ class App(QtWidgets.QMainWindow):
     #################################################################################################################
     def test(self):
         print("func test")
+
+        
         
 
     def deploy(self):

@@ -22,6 +22,15 @@ def find_main_file(path):
     return file_list
 
 def find_headers(path):
+    """
+    find_headers find the files ending with ".hpp" in the path given as an argment
+    
+    Args:
+        path (pathlib.Path): directory where the function search for .hpp files
+    
+    Returns:
+        list(pathlib.path): list of the headers found
+    """
     file_list = []
     for cpp in find_files(path, "hpp"):
         file_list.append(cpp)
@@ -46,6 +55,31 @@ def find_files(path, ext):
     return file_list
 
     
+def is_one_char_not_a_whitespace(text):
+    assert type(text) is str
+
+    for c in text:
+        if c!= " ": # if one on the caracter of txt is not a whitespace
+            return True
+    
+    return False
+
+def is_there_space_in_middle_str(text):
+    assert type(text) is str
+
+    while text.startswith(" ") or text.endswith(" "):
+        if text.startswith(" "):
+            text = text[1:]
+
+        if text.endswith(" "):
+            text = text[:-1]
+
+    
+    for c in text:
+        if c == " ":
+            return True
+    return False
+
         
 
 

@@ -5,3 +5,4 @@ ui/generate.sh
 venv/*
 xmind/*
 ui/__pycache__/*
+src/ui/__pycache__/*
