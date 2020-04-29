@@ -22,3 +22,12 @@ def is_there_space_in_middle_str(text):
         if c == " ":
             return True
     return False
+
+def is_only_whitespaces(text):
+    assert type(text) is str
+
+    for c in text:
+        if c!= " ": # if one on the caracter of txt is not a whitespace
+            return False
+    
+    return True
