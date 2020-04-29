@@ -1,10 +1,10 @@
 
-from PySide2.QtWidgets import QMessageBox
+from PySide2.QtWidgets import QMessageBox, QApplication
 
 
 
 
-class Popup(.QMessageBox):
+class Popup(QMessageBox):
     def __init__(self,title = "", main_text = ""):
         super().__init__()
         self.setWindowTitle(title)
@@ -30,7 +30,7 @@ class PopupError(Popup):
 
 
 if __name__ == "__main__":
-    qt_app = .QApplication()
+    qt_app = QApplication()
     p = Popup('title', 'test test')
     p.show()
     qt_app.exec_()
