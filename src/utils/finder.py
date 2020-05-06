@@ -1,6 +1,16 @@
 import pathlib as pl
 
+def extensive_find_main_file(path):
+    """
+    find cpp files and return extensives information
 
+    Args:
+        path (pathlib.Path): path to a folder
+
+    Returns:
+        tuple(int, list(pathlib.Path)): number of main files found, list of the main files found
+    """
+    return len(find_main_file(path)), find_main_file(path)
 
 def find_main_file(path):
     """
