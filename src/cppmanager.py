@@ -43,7 +43,7 @@ class App(QtWidgets.QMainWindow):
         self.ui = main_win.Ui_MainWindow()
         # attr
         self.color = True #control if colors are displayed to help the user 
-        self._path = pl.Path()
+        self.__path = pl.Path()
         self.__main_file = None
         self.__modules = None
         self.logger = Logger()
@@ -76,19 +76,27 @@ class App(QtWidgets.QMainWindow):
         #nothing here
 
         # area generator
-        update_funct = lambda: self.update_area_generator() # fonction update pour tout les champs de génération
+        update_funct = lambda: self.update_area_generator() # fonction update pour tout les champs de gÃ©nÃ©ration
         for lied in self.line_edit_generator:
             lied.editingFinished.connect(update_funct)
             lied.textEdited.connect(update_funct)
 
-    def test(self, deploy = False):
-        if not isinstance(deploy, bool):
-            raise TypeError("Wrong type for <deploy> argument for test(self, deploy = False) function, boolean expected.")
-            
-        
+    def test(self):
+        try :
+            self.check_area_generator()
+            self.check_main_file()
+            self.check_modules() ### changer le nom des fonctions
+        except Exception as e:
+            self.logger.warning(e)
+            return False
+        else:
+            return True
 
     def deploy(self):
-        pass
+        if self.test():
+            pass
+            
+        
 
     ### UPDATE AND REFRESH FUNC
 
@@ -103,15 +111,15 @@ class App(QtWidgets.QMainWindow):
         self.logger.info("[APP] App fully refreshed")
 
     def set_workspace(self): #DONE
-        self._path = pl.Path(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Workspace"))
+        self.__path = pl.Path(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Workspace"))
         
-        self.logger.debug(f"[WORKSPACE] Path updated to {self._path}")   
+        self.logger.debug(f"[WORKSPACE] Path updated to {self.__path}")   
          
         self.refresh_workspace()
 
     def refresh_workspace(self): #DONE
-        count, mains = finder.extensive_find_main_file(self._path)
-        self.__modules = finder.find_headers(self._path)
+        count, mains = finder.extensive_find_main_file(self.__path)
+        self.__modules = finder.find_headers(self.__path)
         if count == 0:
             self.__main = None
         elif count == 1:
@@ -134,7 +142,7 @@ class App(QtWidgets.QMainWindow):
         self.logger.debug(f"[UI] Area mode updated")
 
     def update_area_main_file(self):
-        count, mains = finder.extensive_find_main_file(self._path)    
+        count, mains = finder.extensive_find_main_file(self.__path)    
         if self.mode == "create":
             self.ui.lied_main_file.setReadOnly(False)
             try :
@@ -172,7 +180,7 @@ class App(QtWidgets.QMainWindow):
     
     def update_area_module(self): #DONE
         self.ui.liwd_modules_existant.clear()
-        for header in self.__modules: # finder.find_headers(self._path)
+        for header in self.__modules: # finder.find_headers(self.__path)
             self.ui.liwd_modules_existant.addItem(header.name)
         self.logger.info("[AREA] Module list updated")
 
@@ -208,10 +216,10 @@ class App(QtWidgets.QMainWindow):
     def check_area_mode(self):
         pass
 
-    def check_area_main_file(self):
+    def check_main_file(self):
         pass
 
-    def check_area_module(self):
+    def check_modules(self):
         pass
 
     def check_area_generator(self):
@@ -249,7 +257,7 @@ class App(QtWidgets.QMainWindow):
 
     @property
     def str_path(self):
-        return str(self._path.resolve())
+        return str(self.__path.resolve())
 
     @property
     def mode(self):
