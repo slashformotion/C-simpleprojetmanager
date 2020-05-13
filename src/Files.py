@@ -32,6 +32,7 @@ class File(metaclass = MetaFile):
     EXTENSION = ''
     def __init__(self, name):
         assert isinstance(name, str)
+        print(name)
         assert len(name)>=3
         self.name = name
 
@@ -131,7 +132,7 @@ class Main(File):
 
                 f.write(self.__get_includes() + raw_data)
         
-    def deploy(self,WORKSPACE,mode):
+    def deploy(self,WORKSPACE):
         if not WORKSPACE.is_dir():
             raise TypeError("Wrong type for <WORKSPACE> argument")
         

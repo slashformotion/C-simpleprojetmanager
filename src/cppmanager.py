@@ -34,7 +34,7 @@ def set_background_color(lied, level):
                 raise NotImplementedError(f"Level {level} do not exists, please use one in this list : [{keys}]")
             else:
                 lied.setStyleSheet(f"background-color: {COLORS[level]};")
-        
+
 
 
 class App(QtWidgets.QMainWindow):
@@ -42,7 +42,7 @@ class App(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = main_win.Ui_MainWindow()
         # attr
-        self.color = True #control if colors are displayed to help the user 
+        self.color = True #control if colors are displayed to help the user
         self.__path = pl.Path()
         self.__main_file = None
         self.__modules = None
@@ -60,7 +60,7 @@ class App(QtWidgets.QMainWindow):
         self.ui.btn_deploy.clicked.connect(lambda: self.deploy())
         self.ui.btn_reload.clicked.connect(lambda: self.refresh_app())
 
-        # area workspace 
+        # area workspace
         self.ui.tbtn_set_path_workspace.clicked.connect(lambda: self.set_workspace())
 
         # area mode
@@ -85,19 +85,43 @@ class App(QtWidgets.QMainWindow):
         try :
             self.check_area_generator()
             self.check_main_file()
-            self.check_modules() ### changer le nom des fonctions
+
         except Exception as e:
             self.logger.warning(e)
             return False
         else:
+            self.logger.info("[] Test passed")
             return True
+            
 
     def deploy(self):
         if self.test():
-            pass
-            
-        
+            if self.__main_file == None:
+                main = Files.Main(self.main_path_submited.name)
+            else:
+                main = Files.Main(self.__main_file.name)
+            modules = []
+            for line in self.get_content_generator():
+                modules.append(Files.Module(line[0], line[1], line[2]))
 
+            main.deploy(self.__path)
+            for module in modules:
+                module.deploy(self.__path)
+
+
+    def get_content_generator(self):
+        line1 = [self.ui.lied_mod0.text(),
+                self.ui.lied_namespace0.text(),
+                self.ui.lied_class0.text()]
+        line2 = [self.ui.lied_mod1.text(),
+                self.ui.lied_namespace1.text(),
+                self.ui.lied_class1.text()]
+        line3 = [self.ui.lied_mod2.text(),
+                self.ui.lied_namespace2.text(),
+                self.ui.lied_class2.text()]
+        return [line1,
+                line2,
+                line3]
     ### UPDATE AND REFRESH FUNC
 
     def refresh_app(self): #DONE
@@ -112,9 +136,9 @@ class App(QtWidgets.QMainWindow):
 
     def set_workspace(self): #DONE
         self.__path = pl.Path(QtWidgets.QFileDialog.getExistingDirectory(self, "Select Workspace"))
-        
-        self.logger.debug(f"[WORKSPACE] Path updated to {self.__path}")   
-         
+
+        self.logger.debug(f"[WORKSPACE] Path updated to {self.__path}")
+
         self.refresh_workspace()
 
     def refresh_workspace(self): #DONE
@@ -125,11 +149,11 @@ class App(QtWidgets.QMainWindow):
         elif count == 1:
             self.__main = mains[0]
         else:
-            self.__main = mains[0]    
+            self.__main = mains[0]
         self.logger.info("[WORKSPACE] Workspace refreshed")
         self.update_area_workspace()
         self.update_area_main_file()
-        
+
 
     def update_area_workspace(self): #DONE
         self.ui.lbl_path_workspace.setText(self.str_path)
@@ -141,43 +165,37 @@ class App(QtWidgets.QMainWindow):
         self.update_area_main_file()
         self.logger.debug(f"[UI] Area mode updated")
 
-    def update_area_main_file(self):
-        count, mains = finder.extensive_find_main_file(self.__path)    
+    def update_area_main_file(self): #DONE
+        count, mains = finder.extensive_find_main_file(self.__path)
         if self.mode == "create":
             self.ui.lied_main_file.setReadOnly(False)
             try :
                 if count != 0: # to many main files
                     set_background_color(self.ui.lied_main_file, "critical")
-                    
+
                     self.ui.lied_main_file.setReadOnly(True)
                     raise Exception(f"There is {count} main files at {self.str_path}.")
             except Exception as e:
                 self.logger.warning(e)
             else: # everything is cool
                 set_background_color(self.ui.lied_main_file, "correct")
-                
-                
-                
-                
 
         elif self.mode == "add":
             self.ui.lied_main_file.setReadOnly(True)
             try:
                 if count != 1:
                     set_background_color(self.ui.lied_main_file, "critical")
-                    
+
                     raise Exception(f"There is {count} main files at {self.str_path}.")
             except Exception as e:
                 self.logger.warning(e)
             else:
                 self.__main_file = mains[0]
-                
-            
+
+
         else:
             raise NotImplementedError("This functionnality is not implemented yet, put away your time machine.")
-        
-            
-    
+
     def update_area_module(self): #DONE
         self.ui.liwd_modules_existant.clear()
         for header in self.__modules: # finder.find_headers(self.__path)
@@ -185,7 +203,7 @@ class App(QtWidgets.QMainWindow):
         self.logger.info("[AREA] Module list updated")
 
     def update_area_generator(self): #DONE
-        for lied in self.line_edit_generator:            
+        for lied in self.line_edit_generator:
             if str_handling.is_there_space_in_middle_str(lied.text()):
                 set_background_color(lied, "warning")
             else:
@@ -210,20 +228,35 @@ class App(QtWidgets.QMainWindow):
 
     ### CHECK FUNC
 
-    def check_area_workspace(self):
-        pass
+    def check_main_file(self): # DONE
+        count, mains = finder.extensive_find_main_file(self.__path)
+        if self.mode == "create":
+            if count != 0: # to many main files
+                raise Exception(f"There is {count} main files at {self.str_path}.")
+            else:
+                if self.main_path_submited.exists():
+                    raise FileExistsError("The file you are trying to create already exists") 
+                    
+        elif self.mode == "add":
+            if count != 1:
+                raise Exception(f"There is {count} main files at {self.str_path}.")
+        else:
+            raise NotImplementedError("This functionnality is not implemented yet, put away your time machine.")
+        
 
-    def check_area_mode(self):
-        pass
+    def check_area_generator(self): #DONE
+        def raise_generator_error(error):
+            raise Exception(error)
 
-    def check_main_file(self):
-        pass
+        for lied in self.line_edit_generator:
+            if str_handling.is_there_space_in_middle_str(lied.text()):
+                raise_generator_error("There is a space in the middle of one of the module, namespace or class you provided")
 
-    def check_modules(self):
-        pass
-
-    def check_area_generator(self):
-        pass
+        for module_name, namespace, class_name in zip(self.module_names_list,self.namespaces_list, self.class_s_list):
+            if str_handling.is_one_char_not_a_whitespace(namespace.text()) and not str_handling.is_one_char_not_a_whitespace(module_name.text()):
+                raise_generator_error("You must provide a module name if you submit a namespace name")
+            if str_handling.is_one_char_not_a_whitespace(class_name.text()) and not str_handling.is_one_char_not_a_whitespace(namespace.text()):
+                raise_generator_error("You must provide a namespace name if you submit a class name")
 
     ### PROPERTIES
 
@@ -262,10 +295,10 @@ class App(QtWidgets.QMainWindow):
     @property
     def mode(self):
         return self.ui.cbb_mode.currentText().lower()
-    
 
-
-
+    @property
+    def main_path_submited(self):
+        return self.__path / pl.Path(self.ui.lied_main_file.text() + ".cpp")
 
 if __name__ == "__main__":
     qt_app = QtWidgets.QApplication()

@@ -31,6 +31,18 @@ def find_main_file(path):
                 file_list.append(cpp)
     return file_list
 
+def find_cpp(path):
+    """
+    find <.cpp> files in path 
+
+    Args:
+        path (pathlib.Path): folder to search
+
+    Returns:
+        list(pathlib.Path): path to the <.cpp> files in the directory
+    """
+    return find_files(path, "cpp")
+
 def find_headers(path):
     """
     find_headers find the files ending with ".hpp" in the path given as an argment
@@ -59,6 +71,7 @@ def find_files(path, ext):
         list(pathlib.Path): list of the path of the files searched
     """
     assert isinstance(ext, str)
+    assert path.is_dir()
     file_list = []
     for cpp in sorted(path.glob(f"*.{ext}")):
         file_list.append(pl.Path(cpp)) 
@@ -69,6 +82,5 @@ def find_files(path, ext):
 
 if __name__ == "__main__":
     # test __func__ find_main_file()
-    print(find_main_file(pl.Path("/home/slash/Documents/Programmation/projets/cppsimpleprojetmanager/test/lib")))
-
-
+    print(find_cpp(pl.Path("/home/slash/Documents/Programmation/projets/cppsimpleprojetmanager/test/lib")))
+    
